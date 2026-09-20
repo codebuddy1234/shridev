@@ -1,0 +1,78 @@
+# Local development stack: PostgreSQL, the FastAPI backend and the Next.js
+# frontend. Production deploys use Vercel and a container host instead — see
+# docs/deployment.md.
+#
+#   cp .env.example .env     # then fill in POSTGRES_PASSWORD and SECRET_KEY
+#   docker compose up --build
+#
+# Frontend  http://localhost:3000
+# API docs  http://localhost:8000/docs
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: shridev-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-shridev}
+      # No default: compose fails loudly rather than starting on a known password.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-shridev}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shridev} -d ${POSTGRES_DB:-shridev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shridev-api
+    restart: unless-stopped
+    # Wait for a healthy database so the first migration does not race startup.
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-shridev}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-shridev}
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000/health || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Inlined into the browser bundle at build time, so it must be present
+        # during the image build rather than only at runtime.
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    container_name: shridev-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      # Container-to-container, so the service name rather than localhost.
+      API_URL: http://api:8000
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      ADMIN_SESSION_COOKIE: ${ADMIN_SESSION_COOKIE:-shridev_admin_session}
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:

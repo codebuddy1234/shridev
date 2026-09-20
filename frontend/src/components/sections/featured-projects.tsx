@@ -35,6 +35,7 @@ export async function FeaturedProjects() {
         {projects.length === 0 ? (
           <EmptyState
             className="mt-14"
+            as="h3"
             icon="FolderKanban"
             title="No featured projects published yet"
             description="Case studies are managed through the admin dashboard and appear here as soon as they are marked featured and published."

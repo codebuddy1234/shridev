@@ -94,8 +94,8 @@ export function AiNetwork() {
     svg.addEventListener("pointerleave", onPointerLeave);
 
     if (reduce) {
-      // Static, centred attention — no drift, no animation frames.
-      setFocus({ x: 230, y: 220 });
+      // Static, centred attention: no drift and no animation frames. The
+      // initial state is already the centre, so nothing needs setting here.
       return () => {
         svg.removeEventListener("pointermove", onPointerMove);
         svg.removeEventListener("pointerleave", onPointerLeave);

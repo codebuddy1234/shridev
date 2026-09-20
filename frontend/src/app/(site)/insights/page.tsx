@@ -93,6 +93,10 @@ export default async function InsightsPage() {
                 </ul>
               ) : null}
 
+              {/* Names the list region so the h3 card titles follow an h2,
+                  and gives screen reader users a landmark to jump to. */}
+              <h2 className="sr-only">Published articles</h2>
+
               {/* Lead article gets a wider treatment. */}
               {lead ? (
                 <RevealItem className="mb-5 flex">

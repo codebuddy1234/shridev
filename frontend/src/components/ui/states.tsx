@@ -50,12 +50,17 @@ export function EmptyState({
   description,
   action,
   className,
+  // Defaults to h2 because these panels usually sit directly under a page's
+  // h1. Pass "h3" when the surrounding section already has its own h2, so the
+  // document outline never skips a level.
+  as: Heading = "h2",
 }: {
   icon?: string;
   title: string;
   description?: string;
   action?: React.ReactNode;
   className?: string;
+  as?: "h2" | "h3";
 }) {
   return (
     <div
@@ -67,7 +72,7 @@ export function EmptyState({
       <span className="mb-4 inline-flex size-12 items-center justify-center rounded-full border border-hairline bg-white/[0.03] text-ink-faint">
         <Icon name={icon} size={22} />
       </span>
-      <h3 className="font-display text-lg font-medium text-ink">{title}</h3>
+      <Heading className="font-display text-lg font-medium text-ink">{title}</Heading>
       {description ? (
         <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">{description}</p>
       ) : null}
@@ -81,11 +86,13 @@ export function ErrorState({
   description = "We could not load this content. Please try again in a moment.",
   onRetry,
   className,
+  as: Heading = "h2",
 }: {
   title?: string;
   description?: string;
   onRetry?: React.ReactNode;
   className?: string;
+  as?: "h2" | "h3";
 }) {
   return (
     <div
@@ -98,7 +105,7 @@ export function ErrorState({
       <span className="mb-4 inline-flex size-12 items-center justify-center rounded-full border border-danger/30 bg-danger/10 text-danger">
         <Icon name="AlertCircle" size={22} />
       </span>
-      <h3 className="font-display text-lg font-medium text-ink">{title}</h3>
+      <Heading className="font-display text-lg font-medium text-ink">{title}</Heading>
       <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">{description}</p>
       {onRetry ? (
         <div className="mt-6">{onRetry}</div>

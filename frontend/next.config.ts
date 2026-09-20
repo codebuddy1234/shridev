@@ -71,6 +71,10 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // Emits a self-contained server bundle for the Docker image. Vercel
+  // ignores this and uses its own build output.
+  output: "standalone",
+
   // Never leak the framework version in a response header.
   poweredByHeader: false,
 

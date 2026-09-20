@@ -313,7 +313,7 @@ export function HeroVisual() {
               y="421"
               fontFamily="var(--font-mono), monospace"
               fontSize="9.5"
-              fill="#6b7688"
+              fill="#8792a5"
             >
               validated
             </text>
@@ -343,7 +343,7 @@ export function HeroVisual() {
                 y="240"
                 fontFamily="var(--font-mono), monospace"
                 fontSize="10"
-                fill="#6b7688"
+                fill="#8792a5"
                 letterSpacing="1.4"
               >
                 MODEL

@@ -41,11 +41,18 @@ export function Navbar() {
   }, []);
 
   // Any navigation closes every open surface.
-  useEffect(() => {
+  //
+  // Adjusted during render rather than in an effect: React's recommended
+  // pattern for state that derives from a changing prop. An effect here would
+  // paint the open menu for a frame before closing it, and trips the
+  // set-state-in-effect lint rule for exactly that reason.
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
     setDrawerOpen(false);
     setMegaOpen(false);
     setMobileServicesOpen(false);
-  }, [pathname]);
+  }
 
   // Lock background scroll while the mobile drawer is open.
   useEffect(() => {
