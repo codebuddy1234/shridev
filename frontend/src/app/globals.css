@@ -1,0 +1,260 @@
+@import "tailwindcss";
+
+/* ============================================================
+   ShriDev Design System
+   Tokens are the single source of truth for colour, type,
+   spacing rhythm, radii and elevation across the product.
+   ============================================================ */
+
+@theme {
+  /* --- Surfaces --------------------------------------------------- */
+  --color-canvas: #070a12;
+  --color-surface: #0d1220;
+  --color-surface-2: #121a2c;
+  --color-surface-3: #18223a;
+
+  /* --- Text ------------------------------------------------------- */
+  --color-ink: #f8fafc;
+  --color-ink-muted: #a7b0c0;
+  --color-ink-faint: #6b7688;
+
+  /* --- Brand ------------------------------------------------------ */
+  --color-brand-50: #efedff;
+  --color-brand-100: #ded9ff;
+  --color-brand-200: #c0b7ff;
+  --color-brand-300: #9f92fd;
+  --color-brand-400: #8472fc;
+  --color-brand-500: #6d5dfb;
+  --color-brand-600: #5642e6;
+  --color-brand-700: #4433b8;
+  --color-brand-800: #322686;
+  --color-brand-900: #211a57;
+
+  /* --- Accent ----------------------------------------------------- */
+  --color-accent-300: #6ce9de;
+  --color-accent-400: #3ddbcf;
+  --color-accent-500: #22d3c5;
+  --color-accent-600: #12a89d;
+  --color-accent-700: #0d7a72;
+
+  /* --- Status ----------------------------------------------------- */
+  --color-positive: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-info: #60a5fa;
+
+  /* --- Hairlines -------------------------------------------------- */
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-hairline-strong: rgba(255, 255, 255, 0.14);
+
+  /* --- Type ------------------------------------------------------- */
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-jb), ui-monospace, SFMono-Regular, monospace;
+
+  --text-display-1: clamp(2.75rem, 1.6rem + 4.6vw, 5rem);
+  --text-display-1--line-height: 1.02;
+  --text-display-1--letter-spacing: -0.035em;
+  --text-display-2: clamp(2.25rem, 1.5rem + 3.1vw, 3.5rem);
+  --text-display-2--line-height: 1.06;
+  --text-display-2--letter-spacing: -0.03em;
+  --text-display-3: clamp(1.75rem, 1.35rem + 1.7vw, 2.5rem);
+  --text-display-3--line-height: 1.15;
+  --text-display-3--letter-spacing: -0.024em;
+
+  /* --- Radii ------------------------------------------------------ */
+  --radius-card: 1rem;
+  --radius-panel: 1.5rem;
+
+  /* --- Elevation -------------------------------------------------- */
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  --shadow-lift: 0 1px 2px rgba(0, 0, 0, 0.35), 0 24px 56px -24px rgba(0, 0, 0, 0.75);
+  --shadow-glow: 0 0 0 1px rgba(109, 93, 251, 0.28), 0 24px 64px -28px rgba(109, 93, 251, 0.6);
+
+  /* --- Motion ----------------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* --- Containers -------------------------------------------------- */
+  --container-shell: 76rem;
+}
+
+/* ============================================================
+   Base layer
+   ============================================================ */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-hairline);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Offset anchor targets so the sticky navbar never covers a heading. */
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* Guards every page against accidental horizontal scroll on mobile. */
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* A single, consistent focus treatment for every interactive element. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-500);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-brand-500) 45%, transparent);
+    color: var(--color-ink);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-surface-3) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-canvas);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-surface-3);
+    border-radius: 999px;
+    border: 2px solid var(--color-canvas);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #243050;
+  }
+}
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+
+@utility shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: var(--container-shell);
+  padding-inline: 1.25rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 80rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Vertical rhythm for full-width page sections. */
+@utility section {
+  padding-block: clamp(4rem, 2.5rem + 6vw, 7.5rem);
+}
+
+@utility section-tight {
+  padding-block: clamp(3rem, 2rem + 4vw, 5rem);
+}
+
+/* Brand gradient used sparingly: hero words, key metrics, AI accents. */
+@utility text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-ink) 0%,
+    var(--color-brand-200) 42%,
+    var(--color-accent-400) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Hairline grid that sits behind hero and CTA bands. */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@utility bg-dotgrid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.11) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Thin gradient rule used between major bands. */
+@utility rule-glow {
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    var(--color-hairline-strong) 22%,
+    color-mix(in oklab, var(--color-brand-500) 40%, transparent) 50%,
+    var(--color-hairline-strong) 78%,
+    transparent
+  );
+}
+
+@utility skip-link {
+  position: absolute;
+  left: 1rem;
+  top: 0.75rem;
+  z-index: 100;
+  transform: translateY(-160%);
+  transition: transform 160ms var(--ease-out-soft);
+
+  &:focus-visible {
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   Reduced motion
+   Framer Motion respects this via useReducedMotion(); this block
+   covers CSS-driven animation and any third-party markup.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

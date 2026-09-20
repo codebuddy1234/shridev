@@ -1,0 +1,38 @@
+# --- Dependencies ---------------------------------------------------------
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# --- Environment (never commit real credentials) --------------------------
+.env
+.env.local
+.env.*.local
+.env.production
+!.env.example
+
+# --- Build output ---------------------------------------------------------
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Test & coverage ------------------------------------------------------
+.pytest_cache/
+.coverage
+coverage/
+htmlcov/
+
+# --- Editor & OS ----------------------------------------------------------
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# --- Logs -----------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-error.log*

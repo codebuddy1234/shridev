@@ -1,0 +1,22 @@
+# --- Web framework -------------------------------------------------------
+fastapi==0.141.1
+uvicorn[standard]==0.53.0
+
+# --- Data ----------------------------------------------------------------
+SQLAlchemy==2.0.54
+alembic==1.20.0
+psycopg[binary]==3.3.6
+
+# --- Validation & settings ----------------------------------------------
+pydantic==2.13.5
+pydantic-settings==2.15.0
+email-validator==2.3.0
+
+# --- Security ------------------------------------------------------------
+# PyJWT for token signing; bcrypt used directly rather than through passlib,
+# which is unmaintained and warns against modern bcrypt releases.
+PyJWT==2.14.0
+bcrypt==5.0.0
+
+# --- Tooling -------------------------------------------------------------
+python-dotenv==1.2.3
