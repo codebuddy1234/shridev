@@ -1,17 +1,23 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Sora } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
 import { Analytics } from "@/components/analytics";
 import { JsonLd, organizationSchema } from "@/lib/seo";
 import { absoluteUrl, siteConfig } from "@/content/site";
 
 /**
- * Fonts are self-hosted by next/font at build time — no runtime request to
- * Google, no layout shift, and `display: swap` so text is readable while the
- * webfont loads.
+ * Root layout.
+ *
+ * Owns the document shell only — fonts, base metadata, analytics and the
+ * Organization structured data. Page chrome is supplied by the route group
+ * layouts: `(site)` adds the public navbar and footer, `(admin)` renders the
+ * dashboard without either.
+ *
+ * Fonts are self-hosted by next/font at build time: no runtime request to a
+ * third party, no layout shift, and `display: swap` so text stays readable
+ * while the webfont loads.
  */
+
 const sora = Sora({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -79,18 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <body className="min-h-dvh antialiased">
-        <a href="#main" className="skip-link rounded-full bg-brand-500 px-4 py-2 text-sm font-medium text-white">
-          Skip to main content
-        </a>
-
-        <div className="flex min-h-dvh flex-col">
-          <Navbar />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </div>
-
+        {children}
         <JsonLd data={organizationSchema()} />
         <Analytics />
       </body>

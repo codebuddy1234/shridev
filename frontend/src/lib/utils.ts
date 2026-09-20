@@ -1,5 +1,56 @@
 import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
+
+/**
+ * tailwind-merge, taught about this project's custom theme.
+ *
+ * Without this, `cn("text-display-2", "text-ink")` collapses to `text-ink`:
+ * tailwind-merge cannot tell a custom font-size token from a custom colour
+ * token, so it assumes both belong to the same class group and keeps only the
+ * last one. That silently removed the size from every section heading.
+ *
+ * Registering the custom scales here means each token is classified into the
+ * right group, so a size and a colour coexist and a genuine conflict (two
+ * sizes) still resolves to the last one.
+ */
+
+const brandShades = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"];
+const accentShades = ["300", "400", "500", "600", "700"];
+
+const customColors = [
+  "canvas",
+  "surface",
+  "surface-2",
+  "surface-3",
+  "ink",
+  "ink-muted",
+  "ink-faint",
+  "positive",
+  "warning",
+  "danger",
+  "info",
+  "hairline",
+  "hairline-strong",
+  ...brandShades.map((shade) => `brand-${shade}`),
+  ...accentShades.map((shade) => `accent-${shade}`),
+];
+
+const twMerge = extendTailwindMerge({
+  extend: {
+    theme: {
+      // Matches the --text-* tokens in globals.css.
+      text: ["display-1", "display-2", "display-3"],
+      // Matches the --color-* tokens.
+      color: customColors,
+      // Matches the --radius-* tokens.
+      radius: ["card", "panel"],
+      // Matches the --shadow-* tokens.
+      shadow: ["soft", "lift", "glow"],
+      // Matches --container-shell.
+      container: ["shell"],
+    },
+  },
+});
 
 /** Merge conditional class names, with later Tailwind utilities winning. */
 export function cn(...inputs: ClassValue[]) {

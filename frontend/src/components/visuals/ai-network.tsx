@@ -187,8 +187,8 @@ export function AiNetwork() {
                 x2={b.x}
                 y2={b.y}
                 stroke={weight > 0.35 ? "#22d3c5" : "#6d5dfb"}
-                strokeOpacity={0.07 + weight * 0.5}
-                strokeWidth={0.7 + weight * 1.3}
+                strokeOpacity={0.16 + weight * 0.46}
+                strokeWidth={0.8 + weight * 1.4}
                 style={{ transition: "stroke-opacity 120ms linear, stroke-width 120ms linear" }}
               />
             );
@@ -217,7 +217,7 @@ export function AiNetwork() {
                   r={node.r + weight * 1.8}
                   fill="#0b1020"
                   stroke={colour}
-                  strokeOpacity={0.4 + weight * 0.6}
+                  strokeOpacity={0.5 + weight * 0.5}
                   strokeWidth={1.3 + weight * 0.8}
                   style={{ transition: "r 120ms linear, stroke-opacity 120ms linear" }}
                 />
