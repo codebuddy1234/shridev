@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { ApiError, apiRequest } from "@/lib/api";
+import { API_BASE, ApiError, apiRequest } from "@/lib/api";
 import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/session";
 
 /**
@@ -81,8 +81,35 @@ export async function POST(request: Request) {
     }
 
     console.error("[admin-login] failed:", error);
+
+    // Anything reaching here is an upstream connectivity problem rather than a
+    // credential problem — a wrong password returns 401 above. In development
+    // we name the address that failed, because "could not reach the service"
+    // alone sends people looking for a password fault that does not exist.
+    const unreachable =
+      error instanceof TypeError || (error as { name?: string })?.name === "AbortError";
+
+    if (unreachable && process.env.NODE_ENV !== "production") {
+      return NextResponse.json(
+        {
+          message:
+            `Cannot reach the API at ${API_BASE}. Check that the backend is ` +
+            `running (uvicorn app.main:app --port 8000) and that API_URL in ` +
+            `frontend/.env.local points at it.`,
+        },
+        { status: 502 },
+      );
+    }
+
+    // Production-safe wording: names the likely cause without disclosing the
+    // internal API address. Still says enough that the reader stops suspecting
+    // their password, which is the wrong trail entirely.
     return NextResponse.json(
-      { message: "Could not reach the authentication service. Please try again." },
+      {
+        message: unreachable
+          ? "The authentication service is not responding. This is a connection problem, not a password problem — check that the backend API is running."
+          : "Sign in failed unexpectedly. Please try again.",
+      },
       { status: 502 },
     );
   }
