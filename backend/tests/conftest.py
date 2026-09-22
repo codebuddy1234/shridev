@@ -45,7 +45,14 @@ from app.security import hash_password  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
-def fresh_schema() -> Iterator[None]:
+def fresh_schema(request: pytest.FixtureRequest) -> Iterator[None]:
+    # Tests marked `no_db` exercise pure configuration and must not require a
+    # database — they also rewrite DATABASE_URL, which would point this engine
+    # somewhere unusable.
+    if request.node.get_closest_marker("no_db"):
+        yield
+        return
+
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     # Counters are process-global, so a burst in one test would otherwise

@@ -7,12 +7,19 @@ in production without an explicitly configured ``SECRET_KEY``.
 
 from __future__ import annotations
 
+import logging
 import secrets
 from functools import lru_cache
 from typing import Literal
 
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger(__name__)
+
+# 32 characters is the floor for an HS256 signing key; token_urlsafe(48)
+# produces 64, which is what the documented generator command gives.
+MIN_SECRET_KEY_LENGTH = 32
 
 
 class Settings(BaseSettings):
@@ -40,10 +47,15 @@ class Settings(BaseSettings):
     SQL_ECHO: bool = False
 
     # --- Security -------------------------------------------------------
-    # A random key is generated when unset so development works out of the
-    # box; because it changes on every restart, existing tokens stop working,
-    # which is the intended nudge to set a real one.
-    SECRET_KEY: str = Field(default_factory=lambda: secrets.token_urlsafe(48))
+    # Left blank by default and resolved in _require_production_secrets below.
+    #
+    # A default_factory is deliberately NOT used here: `SECRET_KEY=` in a .env
+    # file arrives as an empty string, which pydantic treats as a *set* value,
+    # so the factory would never run. The key stayed empty and PyJWT failed at
+    # token creation with "HMAC key must not be empty" — after the password had
+    # already verified, which made a configuration fault look like an
+    # authentication one.
+    SECRET_KEY: str = ""
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 8
     # bcrypt work factor. 12 is a reasonable 2020s default; raise as hardware
@@ -89,14 +101,35 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _require_production_secrets(self) -> "Settings":
-        """Fail fast rather than silently running production on a throwaway key."""
-        if self.ENVIRONMENT == "production":
-            import os
-
-            if not os.getenv("SECRET_KEY"):
+        """Resolve the signing key, and fail fast on an unsafe production setup."""
+        # Blank, whitespace-only and unset are all treated as "no key given".
+        # This is checked against the resolved value rather than os.environ,
+        # because pydantic-settings loads .env into the model without exporting
+        # it to the process environment — reading os.getenv here would reject a
+        # perfectly good key that was set in backend/.env.
+        if not self.SECRET_KEY.strip():
+            if self.ENVIRONMENT == "production":
                 raise ValueError(
-                    "SECRET_KEY must be set explicitly when ENVIRONMENT=production. "
-                    "Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(48))\""
+                    "SECRET_KEY must be set to a non-empty value when "
+                    "ENVIRONMENT=production. Generate one with:\n"
+                    '  python -c "import secrets; print(secrets.token_urlsafe(48))"'
+                )
+            # Development convenience: generate an ephemeral key so the app
+            # runs out of the box. It changes on every restart, so sessions do
+            # not survive a reload — hence the warning rather than silence.
+            object.__setattr__(self, "SECRET_KEY", secrets.token_urlsafe(48))
+            logger.warning(
+                "SECRET_KEY is empty; generated a temporary one for this process. "
+                "Admin sessions will end whenever the server restarts. Set SECRET_KEY "
+                "in backend/.env to keep them: "
+                'python -c "import secrets; print(secrets.token_urlsafe(48))"'
+            )
+
+        if self.ENVIRONMENT == "production":
+            if len(self.SECRET_KEY) < MIN_SECRET_KEY_LENGTH:
+                raise ValueError(
+                    f"SECRET_KEY is only {len(self.SECRET_KEY)} characters; at least "
+                    f"{MIN_SECRET_KEY_LENGTH} are required in production."
                 )
             if "localhost" in self.DATABASE_URL or "127.0.0.1" in self.DATABASE_URL:
                 raise ValueError(

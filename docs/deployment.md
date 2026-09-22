@@ -231,4 +231,6 @@ Then submit `sitemap.xml` to Google Search Console and, if you set
 | 429 during testing | Rate limiter doing its job. Wait out `*_RATE_WINDOW_SECONDS`, or restart the API to clear in-process counters. |
 | Images fail with "hostname not configured" | Add the host to `images.remotePatterns` in `next.config.ts` and redeploy. |
 | Backend refuses to start | `ENVIRONMENT=production` with `SECRET_KEY` unset, or a localhost `DATABASE_URL`/`CORS_ORIGINS`. The error names which. |
+| Login returns 500, log shows `InvalidKeyError: HMAC key must not be empty` | `SECRET_KEY` resolved to an empty string. Fixed in config — a blank key now generates a temporary one in development (with a warning) and is refused in production. If you see this, you are on an older revision. |
+| Admin sessions end on every backend restart | `SECRET_KEY` is blank, so a new temporary key is generated each start. Set a real one in `backend/.env`. |
 | Content edits do not appear | ISR caching (60–120s). Admin writes call `revalidatePath`, so this should self-resolve; a hard refresh confirms. |
